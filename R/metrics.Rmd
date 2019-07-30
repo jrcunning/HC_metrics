@@ -1,0 +1,252 @@
+---
+title: "Conservation research metrics"
+output: html_document
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+```
+
+```{bash}
+# Download latest research metrics from Sharepoint document
+wget -O data/Research_Metrics.xlsx https://sheddaquarium.sharepoint.com/:x:/s/Conservation/EVrWpG_x6o9OofNYVkuEnr4B3vsvxgYDNDamVStTRXVWNA?download=1
+```
+
+```{r}
+# Scrape latest citation counts from Google Scholar
+source('R/scrape_gs.R')
+```
+
+```{r}
+library(readxl)
+library(tidyverse)
+library(lubridate)
+library(janitor)
+library(ggthemes)
+library(RColorBrewer)
+
+## ggplot theme
+theme_custom <- function() {
+  theme_few() +
+  theme(legend.title=element_blank())
+}
+
+## ggplot color palette
+```
+
+```{r}
+# Import historical summary metrics (2018 and earlier)
+pre2018 <- read_xlsx("data/pre2018_summary.xlsx")
+
+```
+
+```{r}
+# Import latest research metrics (from 2019 on -- downloaded from SharePoint)
+metrics <- read_xlsx("data/Research_Metrics.xlsx") %>%
+  # Clean numbers in Quantity column (e.g., remove non-numbers such as "~")
+  mutate(Quantity = as.numeric(str_extract(Quantity, "[0-9]+"))) %>%
+  # Bin events into years and quarters
+  mutate(Year = year(EventDate),
+         Quarter = paste0("Q", quarter(EventDate)))
+```
+
+# Publications
+```{r}
+pubsumm <- metrics %>%
+  filter(Category == "Publication") %>%
+  group_by(Year, Quarter) %>%
+  summarize(Quantity = n()) %>%
+  bind_rows(filter(pre2018, Category == "Publications")) %>%
+  select(Year, Quarter, Quantity) %>%
+  ungroup() %>%
+  complete(Year, Quarter, fill = list(Quantity = 0))
+  
+
+ggplot(pubsumm, aes(x = factor(Year), y = Quantity, fill = factor(Year))) +
+  facet_grid(~ Quarter) +
+  geom_bar(stat = "identity", alpha = 0.7) +
+  geom_text(aes(label = ifelse(Quantity == 0, "", Quantity)), color = "white", nudge_y = -0.25) +
+  theme_custom() +
+  labs(x = "")
+
+ggplot(pubsumm, aes(x = Quarter, y = Quantity, fill = factor(Year))) +
+  facet_grid(~ Year) +
+  geom_bar(stat = "identity", alpha = 0.7) +
+  geom_text(aes(label = ifelse(Quantity == 0, "", Quantity)), color = "white", nudge_y = -0.25) +
+  theme_custom() +
+  labs(x = "")
+```
+
+# Media opportunities
+```{r}
+mediasumm <- metrics %>%
+  filter(Category == "Media opportunity") %>%
+  group_by(Year, Quarter) %>%
+  summarize(Quantity = n()) %>%
+  bind_rows(filter(pre2018, Category == "Media opportunity")) %>%
+  select(Year, Quarter, Quantity) %>%
+  ungroup() %>%
+  complete(Year, Quarter, fill = list(Quantity = 0))
+  
+ggplot(mediasumm, aes(x = factor(Year), y = Quantity, fill = factor(Year))) +
+  facet_grid(~ Quarter) +
+  geom_bar(stat = "identity", alpha = 0.7) +
+  geom_text(aes(label = ifelse(Quantity == 0, "", Quantity)), color = "white", nudge_y = -0.5) +
+  theme_custom() +
+  labs(x = "")
+
+ggplot(mediasumm, aes(x = Quarter, y = Quantity, fill = factor(Year))) +
+  facet_grid(~ Year) +
+  geom_bar(stat = "identity", alpha = 0.7) +
+  geom_text(aes(label = ifelse(Quantity == 0, "", Quantity)), color = "white", nudge_y = -0.5) +
+  theme_custom() +
+  labs(x = "")
+```
+
+# Conferences/active meetings
+```{r}
+confmeetsumm <- metrics %>%
+  filter(Category == "Conference or active meeting") %>%
+  group_by(Year, Quarter) %>%
+  summarize(Quantity = n()) %>%
+  bind_rows(filter(pre2018, Category == "Conference or active meeting")) %>%
+  select(Year, Quarter, Quantity) %>%
+  ungroup() %>%
+  complete(Year, Quarter, fill = list(Quantity = 0))
+  
+ggplot(confmeetsumm, aes(x = factor(Year), y = Quantity, fill = factor(Year))) +
+  facet_grid(~ Quarter) +
+  geom_bar(stat = "identity", alpha = 0.7) +
+  geom_text(aes(label = ifelse(Quantity == 0, "", Quantity)), color = "white", nudge_y = -0.75) +
+  theme_custom() +
+  labs(x = "")
+
+ggplot(confmeetsumm, aes(x = Quarter, y = Quantity, fill = factor(Year))) +
+  facet_grid(~ Year) +
+  geom_bar(stat = "identity", alpha = 0.7) +
+  geom_text(aes(label = ifelse(Quantity == 0, "", Quantity)), color = "white", nudge_y = -0.75) +
+  theme_custom() +
+  labs(x = "")
+```
+
+# Total disseminations
+```{r, fig.width = 8.5}
+dissem <- bind_rows(`Publication` = pubsumm, 
+                    `Media opportunity` = mediasumm,
+                    `Conference or active meeting` = confmeetsumm,
+                    .id = "Category") %>%
+  mutate(QY = interaction(Quarter, Year))
+  
+ggplot(dissem, aes(x = Year, y = Quantity, fill = Category)) +
+  facet_grid(~ Quarter) + 
+  geom_bar(stat = "identity", alpha = 0.7) +
+  geom_text(aes(y = Quantity - 1, label = ifelse(Quantity == 0, "", Quantity)), 
+            position = "stack", color = "white") +
+  theme_custom() +
+  labs(x = "")
+
+ggplot(dissem, aes(x = Quarter, y = Quantity, fill = Category)) +
+  facet_grid(~ Year) +
+  geom_bar(stat = "identity", alpha = 0.7) +
+  geom_text(aes(y = Quantity - 1, label = ifelse(Quantity == 0, "", Quantity)), 
+            position = "stack", color = "white") +
+  theme_custom() +
+  labs(x = "")
+```
+
+
+# Citations
+```{r}
+# Import citation count data
+cites <- read_tsv("data/citation_counts.txt")
+
+# Tidy and calculate new citations by quarter
+cites <- cites %>%
+  mutate(Year = year(date),
+         Quarter = paste0("Q", quarter(date))) %>%
+  group_by(Year, Quarter) %>%
+  distinct(date, .keep_all = TRUE) %>%       # Remove duplicated dates
+  filter(date == max(date)) %>%              # Get latest date with available data in each quarter
+  ungroup() %>%
+  arrange(Year, Quarter) %>%                    # Order by year and quarter
+  mutate(Citations = total_cites - lag(total_cites)) %>%  # Calculate number of new citations in quarter
+  select(Year, Quarter, Citations) %>%
+  ungroup() %>%
+  complete(Year = full_seq(c(2019, max(Year)), 1), Quarter, fill = list(Citations = 0))
+  
+# Combine with pre2018 data
+citesumm <- pre2018 %>%
+  filter(Category == "Citations") %>%
+  spread(Category, Quantity) %>%
+  bind_rows(cites)
+
+# Plot cites
+ggplot(citesumm, aes(x = factor(Year), y = Citations, fill = factor(Year))) +
+  facet_grid(~ Quarter) +
+  geom_bar(stat = "identity", alpha = 0.7) +
+  geom_text(aes(label = ifelse(Citations == 0, "", Citations)), color = "white", nudge_y = -2) +
+  theme_custom() +
+  labs(x = "")
+
+ggplot(citesumm, aes(x = Quarter, y = Citations, fill = factor(Year))) +
+  facet_grid(~ Year) +
+  geom_bar(stat = "identity", alpha = 0.7) +
+  geom_text(aes(label = ifelse(Citations == 0, "", Citations)), color = "white", nudge_y = -2) +
+  theme_custom() +
+  labs(x = "")
+```
+
+
+# Citizen/stakeholder engagement
+```{r}
+citstakesumm <- metrics %>%
+  filter(Category == "Citizen/stakeholder engagement") %>%
+  group_by(Year, Quarter) %>%
+  summarize(Quantity = sum(Quantity)) %>%
+  bind_rows(filter(pre2018, Category == "Citizen/stakeholder engagement")) %>%
+  select(Year, Quarter, Quantity) %>%
+  ungroup() %>%
+  complete(Year, Quarter, fill = list(Quantity = 0))
+  
+ggplot(citstakesumm, aes(x = factor(Year), y = Quantity, fill = factor(Year))) +
+  facet_grid(~ Quarter) +
+  geom_bar(stat = "identity", alpha = 0.7) +
+  geom_text(aes(label = ifelse(Quantity == 0, "", Quantity)), color = "white", nudge_y = -10) +
+  theme_custom() +
+  labs(x = "")
+
+ggplot(citstakesumm, aes(x = Quarter, y = Quantity, fill = factor(Year))) +
+  facet_grid(~ Year) +
+  geom_bar(stat = "identity", alpha = 0.7) +
+  geom_text(aes(label = ifelse(Quantity == 0, "", Quantity)), color = "white", nudge_y = -10) +
+  theme_custom() +
+  labs(x = "")
+```
+
+
+# Field days
+```{r}
+fdaysumm <- metrics %>%
+  filter(Category == "Field research") %>%
+  group_by(Year, Quarter) %>%
+  summarize(Quantity = sum(Quantity)) %>%
+  bind_rows(filter(pre2018, Category == "Field research")) %>%
+  select(Year, Quarter, Quantity) %>%
+  ungroup() %>%
+  complete(Year, Quarter, fill = list(Quantity = 0))
+  
+ggplot(fdaysumm, aes(x = factor(Year), y = Quantity, fill = factor(Year))) +
+  facet_grid(~ Quarter) +
+  geom_bar(stat = "identity", alpha = 0.7) +
+  geom_text(aes(label = ifelse(Quantity == 0, "", Quantity)), color = "white", nudge_y = -5) +
+  theme_custom() +
+  labs(x = "")
+
+ggplot(fdaysumm, aes(x = Quarter, y = Quantity, fill = factor(Year))) +
+  facet_grid(~ Year) +
+  geom_bar(stat = "identity", alpha = 0.7) +
+  geom_text(aes(label = ifelse(Quantity == 0, "", Quantity)), color = "white", nudge_y = -5) +
+  theme_custom() +
+  labs(x = "")
+```
