@@ -8,12 +8,12 @@ date: "`r format(Sys.time(), '%d %B, %Y')`"
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
 ```
 
-```{bash}
+```{bash, include = FALSE}
 # Download latest research metrics from Sharepoint document
 wget -O data/Research_Metrics.xlsx https://sheddaquarium.sharepoint.com/:x:/s/Conservation/EVrWpG_x6o9OofNYVkuEnr4B3vsvxgYDNDamVStTRXVWNA?download=1
 ```
 
-```{r}
+```{r, include = FALSE}
 # Scrape latest citation counts from Google Scholar
 source('R/scrape_gs.R')
 ```
