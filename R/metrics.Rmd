@@ -61,9 +61,9 @@ metrics <- read_xlsx("data/Research_Metrics.xlsx") %>%
 
 
 
-#### REPORT FOR 2019 Q2
-metrics <- metrics %>%
-  filter(EventDate <= "2019-06-30")
+#### OPTIONAL: ADD CUTOFF DATE
+# metrics <- metrics %>%
+#   filter(EventDate <= "2019-06-30")
 ```
 
 # Publications
