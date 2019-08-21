@@ -1,5 +1,6 @@
 ---
 title: "Conservation research metrics"
+subtitle: "2019 Q2 Report"
 output: html_document
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 ---
@@ -29,7 +30,15 @@ library(RColorBrewer)
 ## ggplot theme
 theme_custom <- function() {
   theme_few() +
-  theme(legend.title=element_blank())
+  theme(legend.title=element_blank(),
+        legend.position = "bottom",
+        legend.direction = "vertical",
+        legend.justification = "left",
+        legend.text = element_text(size = 14,
+                                   margin = margin(t = 0.2, b = 0.2, unit = "cm")),
+        axis.title = element_text(size = 18),
+        axis.text = element_text(size = 14),
+        strip.text = element_text(size = 18)) 
 }
 
 ## ggplot color palette
@@ -49,6 +58,12 @@ metrics <- read_xlsx("data/Research_Metrics.xlsx") %>%
   # Bin events into years and quarters
   mutate(Year = year(EventDate),
          Quarter = paste0("Q", quarter(EventDate)))
+
+
+
+#### REPORT FOR 2019 Q2
+metrics <- metrics %>%
+  filter(EventDate <= "2019-06-30")
 ```
 
 # Publications
@@ -63,12 +78,12 @@ pubsumm <- metrics %>%
   complete(Year, Quarter, fill = list(Quantity = 0))
   
 
-ggplot(pubsumm, aes(x = factor(Year), y = Quantity, fill = factor(Year))) +
-  facet_grid(~ Quarter) +
-  geom_bar(stat = "identity", alpha = 0.7) +
-  geom_text(aes(label = ifelse(Quantity == 0, "", Quantity)), color = "white", nudge_y = -0.25) +
-  theme_custom() +
-  labs(x = "")
+# ggplot(pubsumm, aes(x = factor(Year), y = Quantity, fill = factor(Year))) +
+#   facet_grid(~ Quarter) +
+#   geom_bar(stat = "identity", alpha = 0.7) +
+#   geom_text(aes(label = ifelse(Quantity == 0, "", Quantity)), color = "white", nudge_y = -0.25) +
+#   theme_custom() +
+#   labs(x = "")
 
 ggplot(pubsumm, aes(x = Quarter, y = Quantity, fill = factor(Year))) +
   facet_grid(~ Year) +
@@ -76,6 +91,14 @@ ggplot(pubsumm, aes(x = Quarter, y = Quantity, fill = factor(Year))) +
   geom_text(aes(label = ifelse(Quantity == 0, "", Quantity)), color = "white", nudge_y = -0.25) +
   theme_custom() +
   labs(x = "")
+
+# ggplot(pubsumm, aes(x = Year, y = Quantity, fill = forcats::fct_rev(Quarter))) +
+#   geom_bar(stat = "identity", alpha = 0.7) +
+#   geom_text(aes(y = Quantity - 0.5, label = ifelse(Quantity == 0, "", Quantity)), 
+#             position = "stack", color = "white") +
+#   theme_custom() +
+#   labs(x = "")
+#   
 ```
 
 # Media opportunities
@@ -89,12 +112,12 @@ mediasumm <- metrics %>%
   ungroup() %>%
   complete(Year, Quarter, fill = list(Quantity = 0))
   
-ggplot(mediasumm, aes(x = factor(Year), y = Quantity, fill = factor(Year))) +
-  facet_grid(~ Quarter) +
-  geom_bar(stat = "identity", alpha = 0.7) +
-  geom_text(aes(label = ifelse(Quantity == 0, "", Quantity)), color = "white", nudge_y = -0.5) +
-  theme_custom() +
-  labs(x = "")
+# ggplot(mediasumm, aes(x = factor(Year), y = Quantity, fill = factor(Year))) +
+#   facet_grid(~ Quarter) +
+#   geom_bar(stat = "identity", alpha = 0.7) +
+#   geom_text(aes(label = ifelse(Quantity == 0, "", Quantity)), color = "white", nudge_y = -0.5) +
+#   theme_custom() +
+#   labs(x = "")
 
 ggplot(mediasumm, aes(x = Quarter, y = Quantity, fill = factor(Year))) +
   facet_grid(~ Year) +
@@ -102,6 +125,13 @@ ggplot(mediasumm, aes(x = Quarter, y = Quantity, fill = factor(Year))) +
   geom_text(aes(label = ifelse(Quantity == 0, "", Quantity)), color = "white", nudge_y = -0.5) +
   theme_custom() +
   labs(x = "")
+
+# ggplot(mediasumm, aes(x = Year, y = Quantity, fill = forcats::fct_rev(Quarter))) +
+#   geom_bar(stat = "identity", alpha = 0.7) +
+#   geom_text(aes(y = Quantity - 0.5, label = ifelse(Quantity == 0, "", Quantity)), 
+#             position = "stack", color = "white") +
+#   theme_custom() +
+#   labs(x = "")
 ```
 
 # Conferences/active meetings
@@ -115,12 +145,12 @@ confmeetsumm <- metrics %>%
   ungroup() %>%
   complete(Year, Quarter, fill = list(Quantity = 0))
   
-ggplot(confmeetsumm, aes(x = factor(Year), y = Quantity, fill = factor(Year))) +
-  facet_grid(~ Quarter) +
-  geom_bar(stat = "identity", alpha = 0.7) +
-  geom_text(aes(label = ifelse(Quantity == 0, "", Quantity)), color = "white", nudge_y = -0.75) +
-  theme_custom() +
-  labs(x = "")
+# ggplot(confmeetsumm, aes(x = factor(Year), y = Quantity, fill = factor(Year))) +
+#   facet_grid(~ Quarter) +
+#   geom_bar(stat = "identity", alpha = 0.7) +
+#   geom_text(aes(label = ifelse(Quantity == 0, "", Quantity)), color = "white", nudge_y = -0.75) +
+#   theme_custom() +
+#   labs(x = "")
 
 ggplot(confmeetsumm, aes(x = Quarter, y = Quantity, fill = factor(Year))) +
   facet_grid(~ Year) +
@@ -128,23 +158,30 @@ ggplot(confmeetsumm, aes(x = Quarter, y = Quantity, fill = factor(Year))) +
   geom_text(aes(label = ifelse(Quantity == 0, "", Quantity)), color = "white", nudge_y = -0.75) +
   theme_custom() +
   labs(x = "")
+
+# ggplot(confmeetsumm, aes(x = Year, y = Quantity, fill = forcats::fct_rev(Quarter))) +
+#   geom_bar(stat = "identity", alpha = 0.7) +
+#   geom_text(aes(y = Quantity - 0.5, label = ifelse(Quantity == 0, "", Quantity)), 
+#             position = "stack", color = "white") +
+#   theme_custom() +
+#   labs(x = "")
 ```
 
 # Total disseminations
-```{r, fig.width = 8.5}
+```{r}
 dissem <- bind_rows(`Publication` = pubsumm, 
                     `Media opportunity` = mediasumm,
                     `Conference or active meeting` = confmeetsumm,
                     .id = "Category") %>%
   mutate(QY = interaction(Quarter, Year))
   
-ggplot(dissem, aes(x = Year, y = Quantity, fill = Category)) +
-  facet_grid(~ Quarter) + 
-  geom_bar(stat = "identity", alpha = 0.7) +
-  geom_text(aes(y = Quantity - 1, label = ifelse(Quantity == 0, "", Quantity)), 
-            position = "stack", color = "white") +
-  theme_custom() +
-  labs(x = "")
+# ggplot(dissem, aes(x = Year, y = Quantity, fill = Category)) +
+#   facet_grid(~ Quarter) + 
+#   geom_bar(stat = "identity", alpha = 0.7) +
+#   geom_text(aes(y = Quantity - 1, label = ifelse(Quantity == 0, "", Quantity)), 
+#             position = "stack", color = "white") +
+#   theme_custom() +
+#   labs(x = "")
 
 ggplot(dissem, aes(x = Quarter, y = Quantity, fill = Category)) +
   facet_grid(~ Year) +
@@ -182,12 +219,12 @@ citesumm <- pre2018 %>%
   bind_rows(cites)
 
 # Plot cites
-ggplot(citesumm, aes(x = factor(Year), y = Citations, fill = factor(Year))) +
-  facet_grid(~ Quarter) +
-  geom_bar(stat = "identity", alpha = 0.7) +
-  geom_text(aes(label = ifelse(Citations == 0, "", Citations)), color = "white", nudge_y = -2) +
-  theme_custom() +
-  labs(x = "")
+# ggplot(citesumm, aes(x = factor(Year), y = Citations, fill = factor(Year))) +
+#   facet_grid(~ Quarter) +
+#   geom_bar(stat = "identity", alpha = 0.7) +
+#   geom_text(aes(label = ifelse(Citations == 0, "", Citations)), color = "white", nudge_y = -2) +
+#   theme_custom() +
+#   labs(x = "")
 
 ggplot(citesumm, aes(x = Quarter, y = Citations, fill = factor(Year))) +
   facet_grid(~ Year) +
@@ -195,6 +232,13 @@ ggplot(citesumm, aes(x = Quarter, y = Citations, fill = factor(Year))) +
   geom_text(aes(label = ifelse(Citations == 0, "", Citations)), color = "white", nudge_y = -2) +
   theme_custom() +
   labs(x = "")
+
+# ggplot(citesumm, aes(x = Year, y = Citations, fill = forcats::fct_rev(Quarter))) +
+#   geom_bar(stat = "identity", alpha = 0.7) +
+#   geom_text(aes(y = Citations - 2, label = ifelse(Citations == 0, "", Citations)), 
+#             position = "stack", color = "white") +
+#   theme_custom() +
+#   labs(x = "")
 ```
 
 
@@ -209,12 +253,12 @@ citstakesumm <- metrics %>%
   ungroup() %>%
   complete(Year, Quarter, fill = list(Quantity = 0))
   
-ggplot(citstakesumm, aes(x = factor(Year), y = Quantity, fill = factor(Year))) +
-  facet_grid(~ Quarter) +
-  geom_bar(stat = "identity", alpha = 0.7) +
-  geom_text(aes(label = ifelse(Quantity == 0, "", Quantity)), color = "white", nudge_y = -10) +
-  theme_custom() +
-  labs(x = "")
+# ggplot(citstakesumm, aes(x = factor(Year), y = Quantity, fill = factor(Year))) +
+#   facet_grid(~ Quarter) +
+#   geom_bar(stat = "identity", alpha = 0.7) +
+#   geom_text(aes(label = ifelse(Quantity == 0, "", Quantity)), color = "white", nudge_y = -10) +
+#   theme_custom() +
+#   labs(x = "")
 
 ggplot(citstakesumm, aes(x = Quarter, y = Quantity, fill = factor(Year))) +
   facet_grid(~ Year) +
@@ -222,6 +266,13 @@ ggplot(citstakesumm, aes(x = Quarter, y = Quantity, fill = factor(Year))) +
   geom_text(aes(label = ifelse(Quantity == 0, "", Quantity)), color = "white", nudge_y = -10) +
   theme_custom() +
   labs(x = "")
+
+# ggplot(citstakesumm, aes(x = Year, y = Quantity, fill = forcats::fct_rev(Quarter))) +
+#   geom_bar(stat = "identity", alpha = 0.7) +
+#   geom_text(aes(y = Quantity - 5, label = ifelse(Quantity == 0, "", Quantity)), 
+#             position = "stack", color = "white") +
+#   theme_custom() +
+#   labs(x = "")
 ```
 
 
@@ -236,12 +287,12 @@ fdaysumm <- metrics %>%
   ungroup() %>%
   complete(Year, Quarter, fill = list(Quantity = 0))
   
-ggplot(fdaysumm, aes(x = factor(Year), y = Quantity, fill = factor(Year))) +
-  facet_grid(~ Quarter) +
-  geom_bar(stat = "identity", alpha = 0.7) +
-  geom_text(aes(label = ifelse(Quantity == 0, "", Quantity)), color = "white", nudge_y = -5) +
-  theme_custom() +
-  labs(x = "")
+# ggplot(fdaysumm, aes(x = factor(Year), y = Quantity, fill = factor(Year))) +
+#   facet_grid(~ Quarter) +
+#   geom_bar(stat = "identity", alpha = 0.7) +
+#   geom_text(aes(label = ifelse(Quantity == 0, "", Quantity)), color = "white", nudge_y = -5) +
+#   theme_custom() +
+#   labs(x = "")
 
 ggplot(fdaysumm, aes(x = Quarter, y = Quantity, fill = factor(Year))) +
   facet_grid(~ Year) +
@@ -249,4 +300,11 @@ ggplot(fdaysumm, aes(x = Quarter, y = Quantity, fill = factor(Year))) +
   geom_text(aes(label = ifelse(Quantity == 0, "", Quantity)), color = "white", nudge_y = -5) +
   theme_custom() +
   labs(x = "")
+
+# ggplot(fdaysumm, aes(x = Year, y = Quantity, fill = forcats::fct_rev(Quarter))) +
+#   geom_bar(stat = "identity", alpha = 0.7) +
+#   geom_text(aes(y = Quantity - 1, label = ifelse(Quantity == 0, "", Quantity)), 
+#             position = "stack", color = "white") +
+#   theme_custom() +
+#   labs(x = "")
 ```
