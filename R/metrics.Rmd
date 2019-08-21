@@ -32,13 +32,14 @@ theme_custom <- function() {
   theme_few() +
   theme(legend.title=element_blank(),
         legend.position = "bottom",
-        legend.direction = "vertical",
-        legend.justification = "left",
-        legend.text = element_text(size = 14,
-                                   margin = margin(t = 0.2, b = 0.2, unit = "cm")),
+        legend.direction = "horizontal",
+        legend.justification = "center",
+        legend.text = element_text(size = 14),
         axis.title = element_text(size = 18),
         axis.text = element_text(size = 14),
-        strip.text = element_text(size = 18)) 
+        strip.text = element_text(size = 18),
+        plot.title = element_text(size = 20, hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
 }
 
 ## ggplot color palette
@@ -62,8 +63,8 @@ metrics <- read_xlsx("data/Research_Metrics.xlsx") %>%
 
 
 #### OPTIONAL: ADD CUTOFF DATE
-# metrics <- metrics %>%
-#   filter(EventDate <= "2019-06-30")
+metrics <- metrics %>%
+  filter(EventDate <= "2019-06-30")
 ```
 
 # Publications
@@ -90,7 +91,8 @@ ggplot(pubsumm, aes(x = Quarter, y = Quantity, fill = factor(Year))) +
   geom_bar(stat = "identity", alpha = 0.7) +
   geom_text(aes(label = ifelse(Quantity == 0, "", Quantity)), color = "white", nudge_y = -0.25) +
   theme_custom() +
-  labs(x = "")
+  theme(legend.position = "none") +
+  labs(x = "", y = "", title = "Number of Scientific Publications")
 
 # ggplot(pubsumm, aes(x = Year, y = Quantity, fill = forcats::fct_rev(Quarter))) +
 #   geom_bar(stat = "identity", alpha = 0.7) +
@@ -124,7 +126,8 @@ ggplot(mediasumm, aes(x = Quarter, y = Quantity, fill = factor(Year))) +
   geom_bar(stat = "identity", alpha = 0.7) +
   geom_text(aes(label = ifelse(Quantity == 0, "", Quantity)), color = "white", nudge_y = -0.5) +
   theme_custom() +
-  labs(x = "")
+  theme(legend.position = "none") +
+  labs(x = "", y = "", title = "Number of Print/Media Opportunities")
 
 # ggplot(mediasumm, aes(x = Year, y = Quantity, fill = forcats::fct_rev(Quarter))) +
 #   geom_bar(stat = "identity", alpha = 0.7) +
@@ -157,7 +160,8 @@ ggplot(confmeetsumm, aes(x = Quarter, y = Quantity, fill = factor(Year))) +
   geom_bar(stat = "identity", alpha = 0.7) +
   geom_text(aes(label = ifelse(Quantity == 0, "", Quantity)), color = "white", nudge_y = -0.75) +
   theme_custom() +
-  labs(x = "")
+  theme(legend.position = "none") +
+  labs(x = "", y = "", title = "Number of Presentations", subtitle = "(at conferences or active meetings)")
 
 # ggplot(confmeetsumm, aes(x = Year, y = Quantity, fill = forcats::fct_rev(Quarter))) +
 #   geom_bar(stat = "identity", alpha = 0.7) +
@@ -169,9 +173,9 @@ ggplot(confmeetsumm, aes(x = Quarter, y = Quantity, fill = factor(Year))) +
 
 # Total disseminations
 ```{r}
-dissem <- bind_rows(`Publication` = pubsumm, 
-                    `Media opportunity` = mediasumm,
-                    `Conference or active meeting` = confmeetsumm,
+dissem <- bind_rows(`Scientific Pubs.        ` = pubsumm, 
+                    `Print/Media        ` = mediasumm,
+                    `Presentations        ` = confmeetsumm,
                     .id = "Category") %>%
   mutate(QY = interaction(Quarter, Year))
   
@@ -189,7 +193,8 @@ ggplot(dissem, aes(x = Quarter, y = Quantity, fill = Category)) +
   geom_text(aes(y = Quantity - 1, label = ifelse(Quantity == 0, "", Quantity)), 
             position = "stack", color = "white") +
   theme_custom() +
-  labs(x = "")
+  theme(legend.spacing.x = unit(1, "mm")) +
+  labs(x = "", y = "", title = "Number of Dissemination Outputs")
 ```
 
 
@@ -231,7 +236,8 @@ ggplot(citesumm, aes(x = Quarter, y = Citations, fill = factor(Year))) +
   geom_bar(stat = "identity", alpha = 0.7) +
   geom_text(aes(label = ifelse(Citations == 0, "", Citations)), color = "white", nudge_y = -2) +
   theme_custom() +
-  labs(x = "")
+  theme(legend.position = "none") +
+  labs(x = "", y = "", title = "Number of Citations")
 
 # ggplot(citesumm, aes(x = Year, y = Citations, fill = forcats::fct_rev(Quarter))) +
 #   geom_bar(stat = "identity", alpha = 0.7) +
@@ -265,7 +271,8 @@ ggplot(citstakesumm, aes(x = Quarter, y = Quantity, fill = factor(Year))) +
   geom_bar(stat = "identity", alpha = 0.7) +
   geom_text(aes(label = ifelse(Quantity == 0, "", Quantity)), color = "white", nudge_y = -10) +
   theme_custom() +
-  labs(x = "")
+  theme(legend.position = "none") +
+  labs(x = "", y = "", title = "Number of Citizen Scientists/Stakeholders")
 
 # ggplot(citstakesumm, aes(x = Year, y = Quantity, fill = forcats::fct_rev(Quarter))) +
 #   geom_bar(stat = "identity", alpha = 0.7) +
@@ -299,7 +306,8 @@ ggplot(fdaysumm, aes(x = Quarter, y = Quantity, fill = factor(Year))) +
   geom_bar(stat = "identity", alpha = 0.7) +
   geom_text(aes(label = ifelse(Quantity == 0, "", Quantity)), color = "white", nudge_y = -5) +
   theme_custom() +
-  labs(x = "")
+  theme(legend.position = "none") +
+  labs(x = "", y = "", title = "Number of Field Days")
 
 # ggplot(fdaysumm, aes(x = Year, y = Quantity, fill = forcats::fct_rev(Quarter))) +
 #   geom_bar(stat = "identity", alpha = 0.7) +
