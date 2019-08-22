@@ -193,7 +193,8 @@ ggplot(dissem, aes(x = Quarter, y = Quantity, fill = Category)) +
   geom_text(aes(y = Quantity - 1, label = ifelse(Quantity == 0, "", Quantity)), 
             position = "stack", color = "white") +
   theme_custom() +
-  theme(legend.spacing.x = unit(1, "mm")) +
+  theme(legend.spacing.x = unit(1, "mm"),
+        legend.box.margin=margin(-30,0,0,0)) +
   labs(x = "", y = "", title = "Number of Dissemination Outputs")
 ```
 
@@ -202,6 +203,10 @@ ggplot(dissem, aes(x = Quarter, y = Quantity, fill = Category)) +
 ```{r}
 # Import citation count data
 cites <- read_tsv("data/citation_counts.txt")
+
+# Filter to 2019 Q2
+cites <- cites %>%
+  filter(date <= "2019-06-30")
 
 # Tidy and calculate new citations by quarter
 cites <- cites %>%
