@@ -1,6 +1,5 @@
 ---
 title: "Conservation research metrics"
-subtitle: "2019 Q2 Report"
 output: html_document
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 ---
@@ -63,12 +62,14 @@ metrics <- read_xlsx("data/Research_Metrics.xlsx") %>%
 
 
 #### OPTIONAL: ADD CUTOFF DATE
-metrics <- metrics %>%
-  filter(EventDate <= "2019-06-30")
+# metrics <- metrics %>%
+#   filter(EventDate <= "2019-06-30")
 ```
 
-# Publications
+
 ```{r}
+# Publications
+
 pubsumm <- metrics %>%
   filter(Category == "Publication") %>%
   group_by(Year, Quarter) %>%
@@ -103,8 +104,10 @@ ggplot(pubsumm, aes(x = Quarter, y = Quantity, fill = factor(Year))) +
 #   
 ```
 
-# Media opportunities
+
 ```{r}
+# Media opportunities
+
 mediasumm <- metrics %>%
   filter(Category == "Media opportunity") %>%
   group_by(Year, Quarter) %>%
@@ -137,8 +140,10 @@ ggplot(mediasumm, aes(x = Quarter, y = Quantity, fill = factor(Year))) +
 #   labs(x = "")
 ```
 
-# Conferences/active meetings
+
 ```{r}
+# Conferences/active meetings
+
 confmeetsumm <- metrics %>%
   filter(Category == "Conference or active meeting") %>%
   group_by(Year, Quarter) %>%
@@ -171,8 +176,10 @@ ggplot(confmeetsumm, aes(x = Quarter, y = Quantity, fill = factor(Year))) +
 #   labs(x = "")
 ```
 
-# Total disseminations
+
 ```{r}
+# Total disseminations
+
 dissem <- bind_rows(`Scientific Pubs.        ` = pubsumm, 
                     `Print/Media        ` = mediasumm,
                     `Presentations        ` = confmeetsumm,
@@ -199,14 +206,16 @@ ggplot(dissem, aes(x = Quarter, y = Quantity, fill = Category)) +
 ```
 
 
-# Citations
+
 ```{r}
+# Citations
+
 # Import citation count data
 cites <- read_tsv("data/citation_counts.txt")
 
-# Filter to 2019 Q2
-cites <- cites %>%
-  filter(date <= "2019-06-30")
+#### OPTIONAL: ADD CUTOFF DATE
+# cites <- cites %>%
+#   filter(date <= "2019-06-30")
 
 # Tidy and calculate new citations by quarter
 cites <- cites %>%
@@ -253,8 +262,10 @@ ggplot(citesumm, aes(x = Quarter, y = Citations, fill = factor(Year))) +
 ```
 
 
-# Citizen/stakeholder engagement
+
 ```{r}
+# Citizen/stakeholder engagement
+
 citstakesumm <- metrics %>%
   filter(Category == "Citizen/stakeholder engagement") %>%
   group_by(Year, Quarter) %>%
@@ -288,8 +299,10 @@ ggplot(citstakesumm, aes(x = Quarter, y = Quantity, fill = factor(Year))) +
 ```
 
 
-# Field days
+
 ```{r}
+# Field days
+
 fdaysumm <- metrics %>%
   filter(Category == "Field research") %>%
   group_by(Year, Quarter) %>%
