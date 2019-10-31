@@ -1,5 +1,6 @@
 ---
 title: "Conservation research metrics"
+subtitle: ""
 output: html_document
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 ---
@@ -63,7 +64,7 @@ metrics <- read_xlsx("data/Research_Metrics.xlsx") %>%
 
 #### OPTIONAL: ADD CUTOFF DATE
 # metrics <- metrics %>%
-#   filter(EventDate <= "2019-06-30")
+#    filter(EventDate <= "2019-09-30")
 ```
 
 
@@ -215,7 +216,7 @@ cites <- read_tsv("data/citation_counts.txt")
 
 #### OPTIONAL: ADD CUTOFF DATE
 # cites <- cites %>%
-#   filter(date <= "2019-06-30")
+#   filter(date <= "2019-09-30")
 
 # Tidy and calculate new citations by quarter
 cites <- cites %>%
