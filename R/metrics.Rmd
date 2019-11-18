@@ -270,7 +270,7 @@ ggplot(citesumm, aes(x = Quarter, y = Citations, fill = factor(Year))) +
 citstakesumm <- metrics %>%
   filter(Category == "Citizen/stakeholder engagement") %>%
   group_by(Year, Quarter) %>%
-  summarize(Quantity = sum(Quantity)) %>%
+  summarize(Quantity = sum(Quantity, na.rm = TRUE)) %>%
   bind_rows(filter(pre2018, Category == "Citizen/stakeholder engagement")) %>%
   select(Year, Quarter, Quantity) %>%
   ungroup() %>%
