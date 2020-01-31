@@ -1,15 +1,15 @@
 ---
 title: "Conservation research metrics"
-subtitle: ""
+subtitle: "2019 Q4 Report"
 output: html_document
-date: "`r format(Sys.time(), '%d %B, %Y')`"
+#date: "`r format(Sys.time(), '%d %B, %Y')`"
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
 ```
 
-```{bash, include = FALSE}
+```{bash, include = FALSE, eval = FALSE}
 # Download latest research metrics from Sharepoint document
 wget -O data/Research_Metrics.xlsx https://sheddaquarium.sharepoint.com/:x:/s/Conservation/EVrWpG_x6o9OofNYVkuEnr4B3vsvxgYDNDamVStTRXVWNA?download=1
 ```
@@ -63,8 +63,8 @@ metrics <- read_xlsx("data/Research_Metrics.xlsx") %>%
 
 
 #### OPTIONAL: ADD CUTOFF DATE
-# metrics <- metrics %>%
-#    filter(EventDate <= "2019-09-30")
+metrics <- metrics %>%
+   filter(EventDate <= "2019-12-31")
 ```
 
 
@@ -215,8 +215,8 @@ ggplot(dissem, aes(x = Quarter, y = Quantity, fill = Category)) +
 cites <- read_tsv("data/citation_counts.txt")
 
 #### OPTIONAL: ADD CUTOFF DATE
-# cites <- cites %>%
-#   filter(date <= "2019-09-30")
+cites <- cites %>%
+  filter(date <= "2019-12-31")
 
 # Tidy and calculate new citations by quarter
 cites <- cites %>%
