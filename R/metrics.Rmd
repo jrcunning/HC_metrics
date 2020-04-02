@@ -1,8 +1,8 @@
 ---
 title: "Conservation research metrics"
-subtitle: "2019 Q4 Report"
+subtitle: ""
 output: html_document
-#date: "`r format(Sys.time(), '%d %B, %Y')`"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
 ---
 
 ```{r setup, include=FALSE}
