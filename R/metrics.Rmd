@@ -7,6 +7,10 @@ date: "`r format(Sys.time(), '%d %B, %Y')`"
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+
+# Set cutoff date
+#cutoff <- Sys.Date()
+cutoff <- as.Date("2020-03-31")
 ```
 
 ```{bash, include = FALSE, eval = FALSE}
@@ -48,7 +52,6 @@ theme_custom <- function() {
 ```{r}
 # Import historical summary metrics (2018 and earlier)
 pre2018 <- read_xlsx("data/pre2018_summary.xlsx")
-
 ```
 
 ```{r}
@@ -60,15 +63,10 @@ metrics <- read_xlsx("data/Research_Metrics.xlsx") %>%
   mutate(Year = year(EventDate),
          Quarter = paste0("Q", quarter(EventDate)))
 
-
-```
-
-```{r, eval = FALSE}
-#### OPTIONAL: ADD CUTOFF DATE
+# Cutoff date (see above; set to today's date or end of quarter for report preparation)
 metrics <- metrics %>%
-   filter(EventDate <= "2020-03-31")
+   filter(EventDate <= cutoff)
 ```
-
 
 ```{r}
 # Publications
@@ -116,24 +114,24 @@ ggplot(mediasumm, aes(x = Quarter, y = Quantity, fill = factor(Year))) +
 
 
 ```{r}
-# Conferences/active meetings
+# Presentations
 
-confmeetsumm <- metrics %>%
-  filter(Category == "Conference or active meeting") %>%
+pressumm <- metrics %>%
+  filter(Category == "Presentation") %>%
   group_by(Year, Quarter) %>%
   summarize(Quantity = n()) %>%
-  bind_rows(filter(pre2018, Category == "Conference or active meeting")) %>%
+  bind_rows(filter(pre2018, Category == "Presentation")) %>%
   select(Year, Quarter, Quantity) %>%
   ungroup() %>%
   complete(Year, Quarter, fill = list(Quantity = 0))
 
-ggplot(confmeetsumm, aes(x = Quarter, y = Quantity, fill = factor(Year))) +
+ggplot(pressumm, aes(x = Quarter, y = Quantity, fill = factor(Year))) +
   facet_grid(~ Year) +
   geom_bar(stat = "identity", alpha = 0.7) +
   geom_text(aes(label = ifelse(Quantity == 0, "", Quantity)), color = "white", nudge_y = -0.75) +
   theme_custom() +
   theme(legend.position = "none") +
-  labs(x = "", y = "", title = "Number of Presentations", subtitle = "(at conferences or active meetings)")
+  labs(x = "", y = "", title = "Number of Presentations")
 ```
 
 
@@ -142,7 +140,7 @@ ggplot(confmeetsumm, aes(x = Quarter, y = Quantity, fill = factor(Year))) +
 
 dissem <- bind_rows(`Scientific Pubs.        ` = pubsumm, 
                     `Print/Media        ` = mediasumm,
-                    `Presentations        ` = confmeetsumm,
+                    `Presentations        ` = pressumm,
                     .id = "Category") %>%
   mutate(QY = interaction(Quarter, Year))
 
@@ -163,13 +161,8 @@ ggplot(dissem, aes(x = Quarter, y = Quantity, fill = Category)) +
 # Citations
 
 # Import citation count data
-cites <- read_tsv("data/citation_counts.txt")
-```
-
-```{r, eval = FALSE}
-#### OPTIONAL: ADD CUTOFF DATE
-cites <- cites %>%
-  filter(date <= "2020-03-31")
+cites <- read_tsv("data/citation_counts.txt") %>%
+  filter(date <= cutoff)
 ```
 
 ```{r}
@@ -205,9 +198,9 @@ ggplot(citesumm, aes(x = Quarter, y = Citations, fill = factor(Year))) +
 
 
 ```{r}
-# Citizen/stakeholder engagement
+# Citizen/stakeholder engagement -- unique individuals
 
-citstakesumm <- metrics %>%
+engagement.unique.ind <- metrics %>%
   filter(Category == "Citizen/stakeholder engagement") %>%
   group_by(Year, Quarter) %>%
   summarize(Quantity = sum(Quantity, na.rm = TRUE)) %>%
@@ -216,8 +209,7 @@ citstakesumm <- metrics %>%
   ungroup() %>%
   complete(Year, Quarter, fill = list(Quantity = 0))
 
-
-ggplot(citstakesumm, aes(x = Quarter, y = Quantity, fill = factor(Year))) +
+ggplot(engagement.unique.ind, aes(x = Quarter, y = Quantity, fill = factor(Year))) +
   facet_grid(~ Year) +
   geom_bar(stat = "identity", alpha = 0.7) +
   geom_text(aes(label = ifelse(Quantity == 0, "", Quantity)), color = "white", nudge_y = -10) +
@@ -226,6 +218,25 @@ ggplot(citstakesumm, aes(x = Quarter, y = Quantity, fill = factor(Year))) +
   labs(x = "", y = "", title = "Number of Citizen Scientists/Stakeholders")
 ```
 
+```{r}
+# Total engagement effort in person*hours
+
+engagement.person.hours <- metrics %>%
+  filter(Category == "Citizen/stakeholder engagement") %>%
+  group_by(Year, Quarter) %>%
+  summarize(Quantity = sum(Effort, na.rm = TRUE)) %>%
+  select(Year, Quarter, Quantity) %>%
+  ungroup() %>%
+  complete(Year, Quarter, fill = list(Quantity = 0))
+
+ggplot(engagement.person.hours, aes(x = Quarter, y = Quantity, fill = factor(Year))) +
+  facet_grid(~ Year) +
+  geom_bar(stat = "identity", alpha = 0.7) +
+  geom_text(aes(label = ifelse(Quantity == 0, "", Quantity)), color = "white", nudge_y = -200) +
+  theme_custom() +
+  theme(legend.position = "none") +
+  labs(x = "", y = "Total person*hours", title = "Citizen/Stakeholder Engagement Effort")
+```
 
 
 ```{r}
