@@ -1,12 +1,14 @@
 ---
-title: "Conservation research metrics"
-subtitle: ""
+title: "Research Metrics Report"
+subtitle: |
+  Daniel P. Haerther Center for Conservation and Research  
+  John G. Shedd Aquarium
 output: html_document
-date: "`r format(Sys.time(), '%d %B, %Y')`"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, fig.height = 4, fig.width = 6)
 
 # Set cutoff date
 cutoff <- Sys.Date()
@@ -18,7 +20,7 @@ cutoff <- Sys.Date()
 wget -O data/Research_Metrics.xlsx https://sheddaquarium.sharepoint.com/:x:/s/Conservation/EVrWpG_x6o9OofNYVkuEnr4B3vsvxgYDNDamVStTRXVWNA?download=1
 ```
 
-```{r, include = FALSE}
+```{r, include = FALSE, eval = FALSE}
 # Scrape latest citation counts from Google Scholar
 source('R/scrape_gs.R')
 ```
@@ -69,6 +71,28 @@ metrics <- metrics %>%
 ```
 
 ```{r}
+# Citations
+
+# Import citation count data
+cites <- read_tsv("data/citation_counts.txt") %>%
+  filter(date <= cutoff)
+```
+
+```{r}
+latest <- tail(cites, 1)
+```
+
+*****
+
+#### *Current publication metrics:*
+##### **Publications:** `r latest$total_pubs`  
+##### **Citations:** `r latest$total_cites`  
+##### **h-index:** `r latest$h_index`  
+##### **i10-index:** `r latest$i10_index` 
+
+*****
+
+```{r}
 # Publications
 
 pubsumm <- metrics %>%
@@ -89,6 +113,35 @@ ggplot(pubsumm, aes(x = Quarter, y = Quantity, fill = factor(Year))) +
   labs(x = "", y = "", title = "Number of Scientific Publications")
 ```
 
+```{r}
+# Tidy and calculate new citations by quarter
+cites <- cites %>%
+  mutate(Year = year(date),
+         Quarter = paste0("Q", quarter(date))) %>%
+  group_by(Year, Quarter) %>%
+  distinct(date, .keep_all = TRUE) %>%       # Remove duplicated dates
+  filter(date == max(date)) %>%              # Get latest date with available data in each quarter
+  ungroup() %>%
+  arrange(Year, Quarter) %>%                    # Order by year and quarter
+  mutate(Citations = total_cites - lag(total_cites)) %>%  # Calculate number of new citations in quarter
+  select(Year, Quarter, Citations) %>%
+  ungroup() %>%
+  complete(Year = full_seq(c(2019, max(Year)), 1), Quarter, fill = list(Citations = 0))
+  
+# Combine with pre2018 data
+citesumm <- pre2018 %>%
+  filter(Category == "Citations") %>%
+  spread(Category, Quantity) %>%
+  bind_rows(cites)
+
+ggplot(citesumm, aes(x = Quarter, y = Citations, fill = factor(Year))) +
+  facet_grid(~ Year) +
+  geom_bar(stat = "identity", alpha = 0.7) +
+  geom_text(aes(label = ifelse(Citations == 0, "", Citations)), color = "white", nudge_y = -2) +
+  theme_custom() +
+  theme(legend.position = "none") +
+  labs(x = "", y = "", title = "Number of Citations")
+```
 
 ```{r}
 # Media opportunities
@@ -154,47 +207,6 @@ ggplot(dissem, aes(x = Quarter, y = Quantity, fill = Category)) +
         legend.box.margin=margin(-30,0,0,0)) +
   labs(x = "", y = "", title = "Number of Dissemination Outputs")
 ```
-
-
-
-```{r}
-# Citations
-
-# Import citation count data
-cites <- read_tsv("data/citation_counts.txt") %>%
-  filter(date <= cutoff)
-```
-
-```{r}
-# Tidy and calculate new citations by quarter
-cites <- cites %>%
-  mutate(Year = year(date),
-         Quarter = paste0("Q", quarter(date))) %>%
-  group_by(Year, Quarter) %>%
-  distinct(date, .keep_all = TRUE) %>%       # Remove duplicated dates
-  filter(date == max(date)) %>%              # Get latest date with available data in each quarter
-  ungroup() %>%
-  arrange(Year, Quarter) %>%                    # Order by year and quarter
-  mutate(Citations = total_cites - lag(total_cites)) %>%  # Calculate number of new citations in quarter
-  select(Year, Quarter, Citations) %>%
-  ungroup() %>%
-  complete(Year = full_seq(c(2019, max(Year)), 1), Quarter, fill = list(Citations = 0))
-  
-# Combine with pre2018 data
-citesumm <- pre2018 %>%
-  filter(Category == "Citations") %>%
-  spread(Category, Quantity) %>%
-  bind_rows(cites)
-
-ggplot(citesumm, aes(x = Quarter, y = Citations, fill = factor(Year))) +
-  facet_grid(~ Year) +
-  geom_bar(stat = "identity", alpha = 0.7) +
-  geom_text(aes(label = ifelse(Citations == 0, "", Citations)), color = "white", nudge_y = -2) +
-  theme_custom() +
-  theme(legend.position = "none") +
-  labs(x = "", y = "", title = "Number of Citations")
-```
-
 
 
 ```{r}
