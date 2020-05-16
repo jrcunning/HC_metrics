@@ -20,7 +20,7 @@ cutoff <- Sys.Date()
 wget -O data/Research_Metrics.xlsx https://sheddaquarium.sharepoint.com/:x:/s/Conservation/EVrWpG_x6o9OofNYVkuEnr4B3vsvxgYDNDamVStTRXVWNA?download=1
 ```
 
-```{r, include = FALSE, eval = FALSE}
+```{r, include = FALSE, eval = TRUE}
 # Scrape latest citation counts from Google Scholar
 source('R/scrape_gs.R')
 ```
