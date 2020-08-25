@@ -137,7 +137,7 @@ citesumm <- pre2018 %>%
 ggplot(citesumm, aes(x = Quarter, y = Citations, fill = factor(Year))) +
   facet_grid(~ Year) +
   geom_bar(stat = "identity", alpha = 0.7) +
-  geom_text(aes(label = ifelse(Citations == 0, "", Citations)), color = "white", nudge_y = -2) +
+  geom_text(aes(label = ifelse(Citations == 0, "", Citations)), color = "white", nudge_y = -5) +
   theme_custom() +
   theme(legend.position = "none") +
   labs(x = "", y = "", title = "Number of Citations")
