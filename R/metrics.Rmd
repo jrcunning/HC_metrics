@@ -53,7 +53,7 @@ theme_custom <- function() {
 
 ```{r}
 # Import historical summary metrics (2018 and earlier)
-pre2018 <- read_xlsx("data/pre2018_summary.xlsx")
+pre2019 <- read_xlsx("data/pre2019_summary.xlsx")
 ```
 
 ```{r}
@@ -99,7 +99,7 @@ pubsumm <- metrics %>%
   filter(Category == "Publication") %>%
   group_by(Year, Quarter) %>%
   summarize(Quantity = n()) %>%
-  bind_rows(filter(pre2018, Category == "Publications")) %>%
+  bind_rows(filter(pre2019, Category == "Publications")) %>%
   select(Year, Quarter, Quantity) %>%
   ungroup() %>%
   complete(Year, Quarter, fill = list(Quantity = 0))
@@ -128,8 +128,8 @@ cites <- cites %>%
   ungroup() %>%
   complete(Year = full_seq(c(2019, max(Year)), 1), Quarter, fill = list(Citations = 0))
   
-# Combine with pre2018 data
-citesumm <- pre2018 %>%
+# Combine with pre2019 data
+citesumm <- pre2019 %>%
   filter(Category == "Citations") %>%
   spread(Category, Quantity) %>%
   bind_rows(cites)
@@ -150,7 +150,7 @@ mediasumm <- metrics %>%
   filter(Category == "Media opportunity") %>%
   group_by(Year, Quarter) %>%
   summarize(Quantity = n()) %>%
-  bind_rows(filter(pre2018, Category == "Media opportunity")) %>%
+  bind_rows(filter(pre2019, Category == "Media opportunity")) %>%
   select(Year, Quarter, Quantity) %>%
   ungroup() %>%
   complete(Year, Quarter, fill = list(Quantity = 0))
@@ -173,7 +173,7 @@ pressumm <- metrics %>%
   filter(Category == "Presentation") %>%
   group_by(Year, Quarter) %>%
   summarize(Quantity = n()) %>%
-  bind_rows(filter(pre2018, Category == "Presentation")) %>%
+  bind_rows(filter(pre2019, Category == "Presentation")) %>%
   select(Year, Quarter, Quantity) %>%
   ungroup() %>%
   complete(Year, Quarter, fill = list(Quantity = 0))
@@ -216,7 +216,7 @@ engagement.unique.ind <- metrics %>%
   filter(Category == "Citizen/stakeholder engagement") %>%
   group_by(Year, Quarter) %>%
   summarize(Quantity = sum(Quantity, na.rm = TRUE)) %>%
-  bind_rows(filter(pre2018, Category == "Citizen/stakeholder engagement")) %>%
+  bind_rows(filter(pre2019, Category == "Citizen/stakeholder engagement")) %>%
   select(Year, Quarter, Quantity) %>%
   ungroup() %>%
   complete(Year, Quarter, fill = list(Quantity = 0))
@@ -258,7 +258,7 @@ fdaysumm <- metrics %>%
   filter(Category == "Field research") %>%
   group_by(Year, Quarter) %>%
   summarize(Quantity = sum(Quantity)) %>%
-  bind_rows(filter(pre2018, Category == "Field research")) %>%
+  bind_rows(filter(pre2019, Category == "Field research")) %>%
   select(Year, Quarter, Quantity) %>%
   ungroup() %>%
   complete(Year, Quarter, fill = list(Quantity = 0))
