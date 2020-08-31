@@ -1,11 +1,20 @@
 library(scholar)
+library(readxl)
 library(tidyverse)
 
 ## Get provided list of Haerther Center authors
 hc_authors <- read_tsv("data/authors.txt") %>% drop_na()
 
-## Get provided reference list of Haerther Center publications since 2012
-hc_references <- read_tsv("data/publications.txt", col_names = "reference")
+## Get provided reference list of pre-2019 Haerther Center publications
+hc_oldrefs <- read_tsv("data/pre2019_publications.txt", col_names = "reference")
+
+## Get newer pubs that have been input into research metrics form
+hc_newrefs <- read_xlsx("data/Research_Metrics.xlsx") %>%
+  filter(Category == "Publication") %>%
+  select(reference = Citation)
+
+## Create combined hc_references 
+hc_references <- bind_rows(hc_oldrefs, hc_newrefs)
 
 # Get publication list for individual author
 #get_publications(hc_authors$scholar_id[14])
