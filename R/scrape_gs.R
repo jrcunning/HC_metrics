@@ -35,7 +35,7 @@ i10.index <- sum(cites >= 10)
 # Summarize citation counts with today's date
 todays_totals <- hc_pubs %>%
   summarise(date = Sys.Date(),
-            total_pubs = nrow(.),
+            total_pubs = nrow(hc_references),
             total_cites = sum(cites),
             h.index = h.index,
             i10.index = i10.index)
