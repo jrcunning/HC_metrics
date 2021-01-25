@@ -63,7 +63,8 @@ metrics <- read_xlsx("data/Research_Metrics.xlsx") %>%
   mutate(Quantity = as.numeric(str_extract(Quantity, "[0-9]+"))) %>%
   # Bin events into years and quarters
   mutate(Year = year(EventDate),
-         Quarter = paste0("Q", quarter(EventDate)))
+         Quarter = paste0("Q", quarter(EventDate)),
+         Effort = as.numeric(Effort))
 
 # Cutoff date (see above; set to today's date or end of quarter for report preparation)
 metrics <- metrics %>%
