@@ -8,11 +8,11 @@ date: "`r format(Sys.time(), '%B %d, %Y')`"
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, fig.height = 4, fig.width = 6)
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, fig.height = 4, fig.width = 8)
 
 # Set cutoff date
 cutoff <- Sys.Date()
-#cutoff <- as.Date("2020-03-31")
+#cutoff <- as.Date("2021-12-31")
 ```
 
 ```{bash, include = FALSE, eval = FALSE}
